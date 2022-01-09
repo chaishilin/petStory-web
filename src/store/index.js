@@ -4,6 +4,8 @@ import user from '@/store/modules/user'
 import program from '@/store/modules/program'
 import programTemplate from '@/store/modules/programTemplate'
 import dataType from '@/store/modules/dataType'
+import story from '@/store/modules/story'
+import pet from '@/store/modules/pet'
 Vue.use(Vuex)
 
 const store = new Vuex.Store({
@@ -12,6 +14,8 @@ const store = new Vuex.Store({
         program,
         programTemplate,
         dataType,
+        story,
+        pet,
     }
 })
 

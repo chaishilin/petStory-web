@@ -4,7 +4,7 @@
     <div slot="header" class="clearfix">
       <span>{{ info.title }}</span>
        <el-tag v-if="info.publicState == '01'">公开</el-tag>
-    <el-tag type="danger" v-else>仅自己可见</el-tag>
+    <el-tag type="danger" v-else>仅自己可见</el-tag> 
       <el-button
         style="float: right; padding: 3px 0"
         type="info"

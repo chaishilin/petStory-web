@@ -21,6 +21,7 @@ export const constantRouterMap = [
 
   { path: '/content', component: () => import('@/components/article/content') },
   { path: '/story', component: () => import('@/views/pets/storyPage') },
+  { path: '/storyEdit', component: () => import('@/views/pets/storyEdit') },
 
 
   { path: '/labelBar', component: () => import('@/components/labelBar') },
