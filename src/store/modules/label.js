@@ -1,21 +1,21 @@
-import {newUserId,getUserCount} from "../../api/user"
+import {getLabel,updateLabel} from "../../api/label"
 
-const user = {
+const label = {
     actions: {
-        NewUserId({ commit }, dataTypeInfo) {
+        GetLabel({ commit }, dataTypeInfo) {
             return new Promise((resolve, reject) => {
                 //封装一个promise
-                newUserId(dataTypeInfo).then((responce) => {
+                getLabel(dataTypeInfo).then((responce) => {
                     resolve(responce)//将结果封装进resolve
                 }).catch((err) => {
                     reject(err)
                 });
             })
         },
-        GetUserCount({ commit }, dataTypeInfo) {
+        UpdateLabel({ commit }, dataTypeInfo) {
             return new Promise((resolve, reject) => {
                 //封装一个promise
-                getUserCount(dataTypeInfo).then((responce) => {
+                updateLabel(dataTypeInfo).then((responce) => {
                     resolve(responce)//将结果封装进resolve
                 }).catch((err) => {
                     reject(err)
@@ -25,4 +25,4 @@ const user = {
        
     }
 }
-export default user
+export default label

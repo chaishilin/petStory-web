@@ -1,4 +1,5 @@
-let domain = "162.14.118.215"
+let basedomain = "localhost"
 let baseUrl = "";
-baseUrl = "http://"+domain+":8080/"
+baseUrl = "http://" + basedomain + ":8080/"
+export var domain = basedomain
 export default baseUrl

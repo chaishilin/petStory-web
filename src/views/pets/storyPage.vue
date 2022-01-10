@@ -1,56 +1,84 @@
 <template>
   <div>
-    <!-- <h1 @click="load">猫猫生存模拟器</h1> -->
-    <h1>请分配属性</h1>
-    <div>幸运值</div>
-    <el-input-number
-      v-model="attribute.born.lucky"
-      :min="0"
-      :max="attribute.born.lucky + attributeSet.left"
-      @change="changeBornAttribute"
-      label="幸运值"
-    ></el-input-number>
-    <div>智力</div>
-    <el-input-number
-      v-model="attribute.born.intelligence"
-      :min="0"
-      :max="attribute.born.intelligence + attributeSet.left"
-      @change="changeBornAttribute"
-      label="智力"
-    ></el-input-number>
-    <div>体力</div>
-    <el-input-number
-      v-model="attribute.born.strength"
-      :min="0"
-      :max="attribute.born.strength + attributeSet.left"
-      @change="changeBornAttribute"
-      label="体力"
-    ></el-input-number>
-    <div>魅力</div>
-    <el-input-number
-      v-model="attribute.born.charm"
-      :min="0"
-      :max="attribute.born.charm + attributeSet.left"
-      @change="changeBornAttribute"
-      label="魅力"
-    ></el-input-number>
-    <br />
-    <br />
-    <el-button type="info" @click="load">开始猫生</el-button>
-        <el-button type="info" @click="loadStory">成长</el-button>
-
-    <div @click="loadStory()">
-      <el-card class="storyLines" id="storyLines">
-        <div v-for="msg in msgList" class="infinite-list-item">
-          <div class="line">{{ msg }}</div>
-          <br />
-        </div>
+    <h1>猫猫生存模拟器</h1>
+    <div class="attrbuteSet" v-if="setAttr == true">
+      <h1>请分配属性</h1>
+      <div>幸运值</div>
+      <el-input-number
+        v-model="attribute.born.lucky"
+        :min="0"
+        :max="attribute.born.lucky + attributeSet.left"
+        @change="changeBornAttribute"
+        label="幸运值"
+      ></el-input-number>
+      <div>智力</div>
+      <el-input-number
+        v-model="attribute.born.intelligence"
+        :min="0"
+        :max="attribute.born.intelligence + attributeSet.left"
+        @change="changeBornAttribute"
+        label="智力"
+      ></el-input-number>
+      <div>体力</div>
+      <el-input-number
+        v-model="attribute.born.strength"
+        :min="0"
+        :max="attribute.born.strength + attributeSet.left"
+        @change="changeBornAttribute"
+        label="体力"
+      ></el-input-number>
+      <div>魅力</div>
+      <el-input-number
+        v-model="attribute.born.charm"
+        :min="0"
+        :max="attribute.born.charm + attributeSet.left"
+        @change="changeBornAttribute"
+        label="魅力"
+      ></el-input-number>
+      <br />
+      <br />
+      <el-tag>你将是今天的第{{ userCount }}只小猫咪</el-tag>
+      <br />
+      <br />
+      <el-button type="info" @click="chooseLabel">选择天赋</el-button>
+    </div>
+    <div class="selectLabel" v-if="setLabel == true">
+      <el-card
+        class="box-card"
+        :key="key"
+        :label="key"
+        v-for="(item, key) in labelList"
+        :name="key"
+      >
+        <el-tag :type="isUseLabel(item)" @click="useLabel(item)">{{
+          item.content
+        }}</el-tag>
       </el-card>
+      <el-button type="info" @click="reload">返回选择属性</el-button>
+
+      <el-button type="info" @click="initWs">开始猫生</el-button>
+    </div>
+    <div class="storyContent" v-if="storyContent == true">
+      <br />
+      <br />
+
+      <div @click="loadStory()">
+        <el-card class="storyLines" id="storyLines">
+          <div v-for="msg in msgList" class="infinite-list-item">
+            <div class="line">{{ msg }}</div>
+            <br />
+          </div>
+        </el-card>
+      </div>
+      <el-button type="info" @click="reload" v-if="reloadPet == true"
+        >重新开始</el-button
+      >
     </div>
   </div>
 </template>
 
 <script>
+import baseWsUrl from "@/api/baseWsUrl";
 export default {
   data() {
     return {
@@ -58,6 +86,14 @@ export default {
       count: 0,
       testRate: 0,
       msgList: [],
+      labelList: [],
+      choosedLabel: [],
+      setAttr: true,
+      setLabel: false,
+      storyContent: false,
+      userId: "",
+      reloadPet: false,
+      userCount: 0,
       attributeSet: {
         left: 20,
         sumNum: 20,
@@ -78,7 +114,7 @@ export default {
     };
   },
   created() {
- 
+    this.getUserCount();
   },
   updated() {
     let ele = document.getElementById("storyLines");
@@ -86,16 +122,44 @@ export default {
   },
   methods: {
     load() {
-      this.msgList = []
-      this.initWs();
+      this.msgList = [];
       this.testRate += 1;
+      var params = {};
+      var chooesdLabelIds = []
+      for(let label of this.choosedLabel){
+        chooesdLabelIds.push(label.labelId)
+      }
+      params["labels"] = chooesdLabelIds
+      params["attribute"] = this.attribute;
+      params["userId"] = this.userId;
       this.$store
-        .dispatch("NewPet", this.attribute)
+        .dispatch("NewPet", params)
         .then((result) => {
           let status = result.data.code;
-          console.log(result.data);
           if (status == 200) {
             console.log(result.data.data);
+          } else {
+            this.$message.error("调用失败 " + result.data.msg);
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+          return false;
+        })
+        .finally(() => {
+          this.storyContent = true;
+          this.setAttr = false;
+          this.setLabel = false;
+          this.loadStory();
+        });
+    },
+    getUserCount() {
+      this.$store
+        .dispatch("GetUserCount")
+        .then((result) => {
+          let status = result.data.code;
+          if (status == 200) {
+            this.userCount = result.data.data;
           } else {
             this.$message.error("调用失败 " + result.data.msg);
           }
@@ -107,23 +171,40 @@ export default {
         .finally(() => {});
     },
     initWs() {
-      console.log("initWs");
-      this.websock = new WebSocket(
-        "ws://162.14.118.215:8080/story/" + "1234" // new Date().getTime()
-      );
+      this.$store
+        .dispatch("NewUserId", this.attribute)
+        .then((result) => {
+          let status = result.data.code;
+          if (status == 200) {
+            this.userId = result.data.data;
+          } else {
+            this.$message.error("调用失败 " + result.data.msg);
+          }
+        })
+        .catch((err) => {
+          return false;
+        })
+        .finally(() => {
+          this.websock = new WebSocket(
+            baseWsUrl + "/" + this.userId // new Date().getTime()
+          );
 
-      this.websock.onopen = function () {
-        console.log("webSocket连接创建。。。");
-      };
+          this.websock.onopen = function () {
+            console.log("webSocket连接创建。。。");
+          };
 
-      this.websock.onmessage = this.wsOnMessage;
-      this.websock.onclose = function (e) {
-        console.log("关闭连接" + e.data);
-      };
+          this.websock.onmessage = this.wsOnMessage;
+          this.websock.onclose = this.wsOnclose;
+          this.load();
+        });
     },
     wsOnMessage(event) {
       var data = event.data;
       this.msgList.push(data);
+    },
+    wsOnclose() {
+      this.reloadPet = true;
+      console.log("关闭连接" + e);
     },
     changeBornAttribute() {
       this.attributeSet.left =
@@ -134,8 +215,65 @@ export default {
           this.attribute.born.charm);
     },
     loadStory() {
-      this.websock.send("")
-    }
+      this.websock.send("");
+    },
+    chooseLabel() {
+      this.storyContent = false;
+      this.setAttr = false;
+      this.setLabel = true;
+      this.$store
+        .dispatch("GetLabel", {})
+        .then((result) => {
+          let status = result.data.code;
+          if (status == 200) {
+            this.labelList = [];
+            for (let item of result.data.data) {
+              item["chooesd"] = false;
+              this.labelList.push(item);
+            }
+          } else {
+            this.$message.error("调用失败 " + result.data.msg);
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+          return false;
+        })
+        .finally(() => {});
+    },
+    useLabel(item) {
+      if (item.chooesd == false) {
+         if(this.choosedLabel.length + 1 > 4){
+            this.$message.error("最多选择4个属性！")
+            return
+          }
+        item.chooesd = true;
+
+      } else {
+        item.chooesd = false;
+      }
+      this.choosedLabel = []
+      for(let label of this.labelList){
+        if(label.chooesd == true){
+          this.choosedLabel.push(label)
+        }
+      }
+    },
+    isUseLabel(item) {
+      for (let label of this.choosedLabel) {
+        if (item == label) {
+          return "primary";
+        }
+      }
+      return "info";
+    },
+    reload() {
+      this.storyContent = false;
+      this.setAttr = true;
+      this.setLabel = false;
+      this.reloadPet = false;
+      this.getUserCount();
+    },
   },
 };
 </script>
@@ -146,7 +284,7 @@ export default {
   -webkit-overflow-scrolling: touch;
   white-space: nowrap;
   width: 100%;
-  height: 200px;
+  height: 250px;
   scroll-behavior: auto;
 }
 .line {
