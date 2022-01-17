@@ -1,6 +1,6 @@
 <template>
   <div class="petStory">
-    <!-- <h1>猫猫生存模拟器</h1> -->
+    <h1>猫猫生存模拟器</h1>
     <div class="attrbuteSet" v-if="setAttr == true">
       <h1>请分配属性</h1>
       <div>幸运值</div>
@@ -287,7 +287,7 @@ export default {
         window.innerHeight ||
         document.documentElement.clientHeight ||
         document.body.clientHeight;
-      this.windowHeight = parseInt(height*0.8) + "px"
+      this.windowHeight = parseInt(height*0.7) + "px"
       console.log(this.windowHeight)
     },
   },

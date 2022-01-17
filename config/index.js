@@ -68,23 +68,6 @@ module.exports = {
     assetsSubDirectory: 'static',
     assetsPublicPath: './',
 
-    proxyTable: {
-      "/api": {
-        target: 'http://162.14.118.215:8080',
-        pathRewrite: { '^/api': '' },
-        ws:true,
-        changeOrigin: true,     // target是域名的话，需要这个参数，
-        secure: false,          // 设置支持https协议的代理
-      },
-      "/socket": {
-        target: 'ws://162.14.118.215:8080',
-        ws:true,
-        pathRewrite: { '^/socket': '' },
-        changeOrigin: true,     // target是域名的话，需要这个参数，
-        secure: false,          // 设置支持https协议的代理
-        
-      }
-    },
 
     /**
      * Source Maps
