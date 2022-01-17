@@ -63,7 +63,7 @@
       <br />
 
       <div @click="loadStory()">
-        <el-card class="storyLines" id="storyLines">
+        <el-card class="storyLines" id="storyLines" :style="{height: windowHeight}">
           <div v-for="msg in msgList" class="infinite-list-item">
             <div class="line">{{ msg }}</div>
             <br />
@@ -283,16 +283,12 @@ export default {
         window.innerWidth ||
         document.documentElement.clientWidth ||
         document.body.clientWidth;
-      this.windowHeight =
+      var height =
         window.innerHeight ||
         document.documentElement.clientHeight ||
         document.body.clientHeight;
+      this.windowHeight = parseInt(height*0.8) + "px"
       console.log(this.windowHeight)
-      if (document.getElementsByClassName("storyLines").length) {
-        let ele = document.getElementsByClassName("storyLines")[0].style;
-        ele.setProperty("--height", this.windowHeight * 0.5 + "px");
-        console.log(this.windowHeight* 0.5)
-      }
     },
   },
 };
@@ -302,17 +298,16 @@ export default {
 .petStory {
   height: 100%;
 }
-.storyLines {
+/* .storyLines {
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   white-space: nowrap;
   width: 100%;
-  height: var(--height);
   scroll-behavior: auto;
   white-space: normal;
   word-break: break-all;
   word-wrap: break-word;
-}
+} */
 .line {
   border: 2px solid palevioletred;
   height: auto;
