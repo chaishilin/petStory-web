@@ -1,12 +1,10 @@
 import axios from "axios";
-import baseUrl from '../api/baseUrl'
 import store from "../store"
 
-//baseUrl = "/"
 
 //创建axios实例
 const service = axios.create({
-    baseURL:baseUrl,
+    baseURL:'/api',
     timeout:15000,
 })
 service.interceptors.request.use((config) => {

@@ -186,7 +186,7 @@ export default {
         })
         .finally(() => {
           this.websock = new WebSocket(
-            baseWsUrl + "/" + this.userId // new Date().getTime()
+            baseWsUrl + this.userId
           );
 
           this.websock.onopen = function () {
@@ -204,7 +204,7 @@ export default {
     },
     wsOnclose() {
       this.reloadPet = true;
-      console.log("关闭连接" + e);
+      console.log("关闭连接");
     },
     changeBornAttribute() {
       this.attributeSet.left =
