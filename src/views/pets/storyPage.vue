@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <h1>猫猫生存模拟器</h1>
+  <div class="petStory">
+    <!-- <h1>猫猫生存模拟器</h1> -->
     <div class="attrbuteSet" v-if="setAttr == true">
       <h1>请分配属性</h1>
       <div>幸运值</div>
@@ -82,6 +82,8 @@ import baseWsUrl from "@/api/baseWsUrl";
 export default {
   data() {
     return {
+      windowWidth: 0,
+      windowHeight: 0,
       websock: null,
       count: 0,
       testRate: 0,
@@ -118,18 +120,22 @@ export default {
   },
   updated() {
     let ele = document.getElementById("storyLines");
-    ele.scrollTop = ele.scrollHeight; //保证滚动条位于最底层
+    if (ele != null) {
+      console.log(ele.scrollHeight);
+      ele.scrollTop = ele.scrollHeight; //保证滚动条位于最底层
+    }
   },
   methods: {
     load() {
+      this.getViewportSize()
       this.msgList = [];
       this.testRate += 1;
       var params = {};
-      var chooesdLabelIds = []
-      for(let label of this.choosedLabel){
-        chooesdLabelIds.push(label.labelId)
+      var chooesdLabelIds = [];
+      for (let label of this.choosedLabel) {
+        chooesdLabelIds.push(label.labelId);
       }
-      params["labels"] = chooesdLabelIds
+      params["labels"] = chooesdLabelIds;
       params["attribute"] = this.attribute;
       params["userId"] = this.userId;
       this.$store
@@ -185,9 +191,7 @@ export default {
           return false;
         })
         .finally(() => {
-          this.websock = new WebSocket(
-            baseWsUrl + this.userId
-          );
+          this.websock = new WebSocket(baseWsUrl + this.userId);
 
           this.websock.onopen = function () {
             console.log("webSocket连接创建。。。");
@@ -204,6 +208,7 @@ export default {
     },
     wsOnclose() {
       this.reloadPet = true;
+      this.$message.info("请重新开始");
       console.log("关闭连接");
     },
     changeBornAttribute() {
@@ -243,19 +248,18 @@ export default {
     },
     useLabel(item) {
       if (item.chooesd == false) {
-         if(this.choosedLabel.length + 1 > 4){
-            this.$message.error("最多选择4个属性！")
-            return
-          }
+        if (this.choosedLabel.length + 1 > 4) {
+          this.$message.error("最多选择4个属性！");
+          return;
+        }
         item.chooesd = true;
-
       } else {
         item.chooesd = false;
       }
-      this.choosedLabel = []
-      for(let label of this.labelList){
-        if(label.chooesd == true){
-          this.choosedLabel.push(label)
+      this.choosedLabel = [];
+      for (let label of this.labelList) {
+        if (label.chooesd == true) {
+          this.choosedLabel.push(label);
         }
       }
     },
@@ -274,20 +278,44 @@ export default {
       this.reloadPet = false;
       this.getUserCount();
     },
+    getViewportSize() {
+      this.windowWidth =
+        window.innerWidth ||
+        document.documentElement.clientWidth ||
+        document.body.clientWidth;
+      this.windowHeight =
+        window.innerHeight ||
+        document.documentElement.clientHeight ||
+        document.body.clientHeight;
+      console.log(this.windowHeight)
+      if (document.getElementsByClassName("storyLines").length) {
+        let ele = document.getElementsByClassName("storyLines")[0].style;
+        ele.setProperty("--height", this.windowHeight * 0.5 + "px");
+        console.log(this.windowHeight* 0.5)
+      }
+    },
   },
 };
 </script>
 
 <style>
+.petStory {
+  height: 100%;
+}
 .storyLines {
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   white-space: nowrap;
   width: 100%;
-  height: 250px;
+  height: var(--height);
   scroll-behavior: auto;
+  white-space: normal;
+  word-break: break-all;
+  word-wrap: break-word;
 }
 .line {
-  border: 1px solid black;
+  border: 2px solid palevioletred;
+  height: auto;
 }
+
 </style>
