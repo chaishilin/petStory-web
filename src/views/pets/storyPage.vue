@@ -112,6 +112,7 @@ export default {
           tailHealth: 0,
         },
         born: { lucky: 0, intelligence: 0, strength: 0, charm: 0 },
+        ageAttr: { age: 0 },
       },
     };
   },
@@ -127,7 +128,7 @@ export default {
   },
   methods: {
     load() {
-      this.getViewportSize()
+      this.getViewportSize();
       this.msgList = [];
       this.testRate += 1;
       var params = {};
@@ -208,8 +209,10 @@ export default {
     },
     wsOnclose() {
       this.reloadPet = true;
-      this.$message.info("请重新开始");
-      console.log("关闭连接");
+      this.$notify({
+        message: "请重新开始猫生",
+      });
+      this.choosedLabel = []
     },
     changeBornAttribute() {
       this.attributeSet.left =
@@ -287,11 +290,11 @@ export default {
         window.innerHeight ||
         document.documentElement.clientHeight ||
         document.body.clientHeight;
-      console.log(this.windowHeight)
+      console.log(this.windowHeight);
       if (document.getElementsByClassName("storyLines").length) {
         let ele = document.getElementsByClassName("storyLines")[0].style;
         ele.setProperty("--height", this.windowHeight * 0.5 + "px");
-        console.log(this.windowHeight* 0.5)
+        console.log(this.windowHeight * 0.5);
       }
     },
   },
@@ -317,5 +320,4 @@ export default {
   border: 2px solid palevioletred;
   height: auto;
 }
-
 </style>

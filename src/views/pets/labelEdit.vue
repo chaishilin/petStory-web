@@ -46,13 +46,22 @@
                     :name="key"
                   >
                     <div v-for="(attrItem, attrKey) in baseAttr">
-                      {{ attrKey }}
-                      <el-tag>属性加成</el-tag>
+                     
+                      <el-tag v-if="attrKey != 'age'"> {{ attrKey }}  属性加成</el-tag>
                       <el-input-number
+                        v-if="attrKey == 'maxAge'"
                         v-model="baseAttr[attrKey]"
                         @change="handleChange"
-                        :min="-10"
-                        :max="10"
+                        :min="-120"
+                        :max="120"
+                        :label="attrKey"
+                      ></el-input-number>
+                      <el-input-number
+                        v-else-if="attrKey != 'age'"
+                        v-model="baseAttr[attrKey]"
+                        @change="handleChange"
+                        :min="-120"
+                        :max="120"
                         :label="attrKey"
                       ></el-input-number>
                     </div>
@@ -85,6 +94,7 @@ export default {
             tailHealth: 0,
           },
           born: { lucky: 0, intelligence: 0, strength: 0, charm: 0 },
+          ageAttr: {maxAge: 0 },
         },
         attributeStr:
           '{"body":{"clean":0,"friendly":0,"hanger":0,"weight":0},"born":{"charm":0,"intelligence":0,"lucky":0,"strength":0},"health":{"bodyHealth":0,"footHealth":0,"headHealth":0,"tailHealth":0,"totalHealth":0},"mod":{"angry":0,"happy":0,"terrified":0}}',
@@ -100,6 +110,7 @@ export default {
             tailHealth: 0,
           },
           born: { lucky: 0, intelligence: 0, strength: 0, charm: 0 },
+          ageAttr: {maxAge: 0 },
         },
       },
       labelList: [],
@@ -132,7 +143,11 @@ export default {
         .then((result) => {
           let status = result.data.code;
           if (status == 200) {
-            this.$message.info("更新成功");
+             this.$notify({
+              title: "成功",
+              message: "更新成功",
+              type: "success",
+            });
             this.getLabelList();
           } else if (status == 401) {
             this.$message.error("请先登录");

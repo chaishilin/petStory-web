@@ -37,23 +37,16 @@
               <el-form-item label="内容">
                 <el-input v-model="item.content" placeholder=""></el-input>
               </el-form-item>
-              <el-form-item label="月龄范围">
-                最小月龄
-                <el-input-number
-                  v-model="item.minAge"
-                  @change="handleChange"
-                  :min="0"
-                  :max="item.maxAge"
-                  label="最小月龄"
-                ></el-input-number>
-                最大月龄
-                <el-input-number
-                  v-model="item.maxAge"
-                  @change="handleChange"
-                  :min="item.minAge"
-                  :max="180"
-                  label="最大月龄"
-                ></el-input-number>
+              <el-form-item label="标签">
+                <el-select v-model="item.tag" placeholder="请选择">
+                  <el-option
+                    v-for="item in tagOptions"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  >
+                  </el-option>
+                </el-select>
               </el-form-item>
               <el-form-item label="属性值">
                 <el-tabs v-model="choosedAttr" @tab-click="handleClick">
@@ -65,24 +58,35 @@
                   >
                     <div v-for="(attrItem, attrKey) in baseAttr">
                       {{ attrKey }}
-                      <el-tag>属性加成</el-tag>
+                      <el-tag v-if="attrKey != 'age'">属性加成</el-tag>
                       <el-input-number
+                        v-if="attrKey != 'age'"
                         v-model="baseAttr[attrKey]"
                         @change="handleChange"
                         :min="-10"
                         :max="10"
                         :label="attrKey"
                       ></el-input-number>
-                      <el-tag>触发下限</el-tag>
+                      <el-tag v-if="attrKey != 'maxAge'">触发下限</el-tag>
                       <el-input-number
+                        v-if="attrKey != 'maxAge'"
                         v-model="item.attributeLow[key][attrKey]"
                         @change="handleChange"
                         :min="0"
                         :max="item.attributeHigh[key][attrKey]"
                         :label="attrKey"
                       ></el-input-number>
-                      <el-tag>触发上限</el-tag>
+                      <el-tag v-if="attrKey != 'maxAge'">触发上限</el-tag>
                       <el-input-number
+                        v-if="attrKey == 'age'"
+                        v-model="item.attributeHigh[key][attrKey]"
+                        @change="handleChange"
+                        :min="item.attributeLow[key][attrKey]"
+                        :max="12 * 100"
+                        :label="attrKey"
+                      ></el-input-number>
+                      <el-input-number
+                        v-else-if="attrKey != 'maxAge'"
                         v-model="item.attributeHigh[key][attrKey]"
                         @change="handleChange"
                         :min="item.attributeLow[key][attrKey]"
@@ -108,8 +112,7 @@ export default {
       storyExample: {
         storyId: "",
         content: "请输入内容",
-        minAge: 4,
-        maxAge: 7,
+        tag: "日常",
         attribute: {
           body: { weight: 0, hanger: 0, friendly: 0, clean: 0 },
           mod: { happy: 0, angry: 0, terrified: 0 },
@@ -121,6 +124,7 @@ export default {
             tailHealth: 0,
           },
           born: { lucky: 0, intelligence: 0, strength: 0, charm: 0 },
+          ageAttr: { age: 0, maxAge: 0 },
         },
         attributeStr: "null",
         state: "01",
@@ -135,6 +139,7 @@ export default {
             tailHealth: 0,
           },
           born: { lucky: 0, intelligence: 0, strength: 0, charm: 0 },
+          ageAttr: { age: 0, maxAge: 0 },
         },
         attributeLowStr: "null",
         attributeHigh: {
@@ -148,11 +153,22 @@ export default {
             tailHealth: 10,
           },
           born: { lucky: 10, intelligence: 10, strength: 10, charm: 10 },
+          ageAttr: { age: 180, maxAge: 12 * 100 },
         },
         attributeHighStr: "null",
       },
       storyList: [],
-      choosedItem:"0",
+      tagOptions: [
+        {
+          value: "日常",
+          label: "日常",
+        },
+        {
+          value: "死亡",
+          label: "死亡",
+        },
+      ],
+      choosedItem: "0",
       contentLike: "",
       choosedAttr: "",
       stateMap: {
@@ -181,7 +197,11 @@ export default {
         .then((result) => {
           let status = result.data.code;
           if (status == 200) {
-            this.$message.info("更新成功");
+            this.$notify({
+              title: "成功",
+              message: "更新成功",
+              type: "success",
+            });
             this.getStoryList();
           } else if (status == 401) {
             this.$message.error("请先登录");
