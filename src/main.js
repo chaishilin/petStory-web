@@ -18,5 +18,5 @@ Vue.config.productionTip = false
 new Vue({
   render: h => h(App),
   router,
-  store//使用vuex进行状态管理
+  store
 }).$mount('#app')
